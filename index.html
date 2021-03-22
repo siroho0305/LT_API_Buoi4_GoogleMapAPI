@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> Google Maps API Demo </title>
+    <style type="text/css">
+        #map {
+            height: 100%;
+        }
+        html,
+
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #floating-panel {
+            position: absolute;
+            z-index: 5;
+            text-align: center;
+            background-color: gray;
+            width: 400px;
+            height: 50px;
+            margin-top: 10px;
+            margin-left: 300px;
+            padding-top: 15px;
+            font-size: 30px;
+            border-radius: 20px;
+        }
+    </style>
+
+    <script>
+        function initMap() {
+            const MyHouse = { lat: 10.8534123, lng: 106.7634388 };
+            const UTC2 = { lat: 10.845915, lng: 106.794567 };
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: UTC2,
+            });
+
+            const icon = {
+                url: "./utc2.png",
+                scaledSize: new google.maps.Size(45, 45),
+            };
+            const iconMyHouse = {
+                url: "./avatar.jpg",
+                scaledSize: new google.maps.Size(45, 45),
+            };
+
+            const utc2Ob = {
+                name: 'PHÂN HIỆU TRƯỜNG ĐH GTVT TẠI TP. HỒ CHÍ MINH',
+                address: '451 Lê Văn Việt, Tăng Nhơn Phú A, thành phố Thủ Đức, Thành phố Hồ Chí Minh',
+                website: 'http://utc2.edu.vn/'
+            }
+
+            const detailUtc2 = '<h1>'+ utc2Ob.name+'</h1>' +
+            '<p><b>Địa chỉ</b>: ' + utc2Ob.address + '</p>' +
+            '<b>Website</b>: ' + '<a href="' + utc2Ob.website + '" target="_blank">' + utc2Ob.website + '</a>'   ;
+
+            const leftClick = new google.maps.InfoWindow({
+                content: detailUtc2,
+            });
+
+            const myHouseOb = {
+                name: 'Hồ Nguyễn Thanh Phong',
+                id: 5951070174,
+                address: '41/3E Võ Văn Ngân, Linh Chiểu, Thủ Đức, Thành phố Hồ Chí Minh',
+                phone: 0364015141
+            }
+
+            const detailMyHouse = '<p><b>Họ tên</b>: '+ myHouseOb.name + '</p>' +
+            '<p><b>MSSV</b>: '+ myHouseOb.id + '</p>' +
+            '<p><b>Địa chỉ</b>: '+ myHouseOb.address + '</p>'+
+            '<p><b>Phone</b>: '+ myHouseOb.phone +'</p>';
+
+            const infoMyHouse = new google.maps.InfoWindow({
+                content: detailMyHouse,
+            });
+
+            const marker = new google.maps.Marker({
+                position: UTC2,
+                title: "UTC2",
+                map: map,
+                icon: icon,
+            });
+
+            marker.addListener("click", () => {
+                leftClick.open(map, marker);
+
+            });
+
+            const markerMyHouse = new google.maps.Marker({
+                position: MyHouse,
+                title: "MyHouse",
+                map: map,
+                icon: iconMyHouse,
+            });
+
+            markerMyHouse.addListener("click", () => {
+                infoMyHouse.open(map, markerMyHouse);
+            });
+
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            const handleChange = () => {
+                calculateAndDisplayRoute(directionsService, directionsRenderer);
+            };
+            document.getElementById("start").addEventListener("change", handleChange);
+            document.getElementById("end").addEventListener("change" , handleChange);
+        }
+
+        const calculateAndDisplayRoute = (directionsService, directionsRenderer) => {
+
+            directionsService.route(
+                {
+                    origin: {
+                        query: document.getElementById("start").value,
+                    },
+                    destination: {
+                        query: document.getElementById("end").value,
+                    },
+                    travelMode: google.maps.TravelMode.DRIVING
+                },
+                (response, status)=>{
+                    if (status === "OK") {
+                        directionsRenderer.setDirections(response);
+                    } else {
+                        window.alert("Direction request failed due to " + status);
+                    }
+                }
+            );
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <div id="floating-panel">
+        <b>Start: </b>
+        <select id="start">
+            <option value="41/3E Võ Văn Ngân, Linh Chiểu, Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam"> MyHouse </option>
+            <option value="PHÂN HIỆU TRƯỜNG ĐH GTVT TẠI TP. HỒ CHÍ MINH, Lê Văn Việt, Tăng Nhơn Phú A, thành phố Thủ Đức, Thành phố Hồ Chí Minh"> UTC2 </option>
+        </select>
+
+        <b>End: </b>
+        <select id="end">
+            <option value="41/3E Võ Văn Ngân, Linh Chiểu, Thủ Đức, Thành phố Hồ Chí Minh, Việt Nam">MyHouse</option>
+            <option value="PHÂN HIỆU TRƯỜNG ĐH GTVT TẠI TP. HỒ CHÍ MINH, Lê Văn Việt, Tăng Nhơn Phú A, thành phố Thủ Đức, Thành phố Hồ Chí Minh">UTC2</option>
+        </select>
+    </div>
+
+    <div id="map"></div>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNI_ZWPqvdS6r6gPVO50I4TlYkfkZdXh8&callback=initMap&libraries=&v=weekly"
+        async>
+    </script>
+</body>
+
+</html>
